@@ -4,6 +4,10 @@ services:
     expose:
       - "8000"
     container_name: kiosk-crawl
+    env_file:
+      - .env.prod
+    environment:
+      - ENV=prod
     networks:
       - kiosk-network
 
