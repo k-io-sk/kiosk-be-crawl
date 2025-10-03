@@ -8,7 +8,7 @@ services:
     networks:
       - kiosk-network
     healthcheck:
-      test: ["executable", "arg"]
+      test: ["CMD", "curl", "-f", "http://localhost:8000"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -16,5 +16,5 @@ services:
 
 networks:
   kiosk-network:
-    external:
-      name: docker_kiosk-network
+    name: docker_kiosk-network
+    external: true
