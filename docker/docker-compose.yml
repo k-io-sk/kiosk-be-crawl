@@ -1,0 +1,16 @@
+version: "3.8"
+services:
+  kiosk-crawl:
+    image: ksieon/kiosk-crawl:latest
+    expose:
+      - "8000"
+    container_name: kiosk-crawl
+    restart: unless-stopped
+    networks:
+      - kiosk-network
+    healthcheck:
+      test: ["executable", "arg"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
