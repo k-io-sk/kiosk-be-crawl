@@ -13,3 +13,8 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
+
+networks:
+  kiosk-network:
+    external:
+      name: docker_kiosk-network
