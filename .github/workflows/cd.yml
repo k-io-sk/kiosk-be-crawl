@@ -32,6 +32,6 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY_PROD }}
           script: |
             cd /home/ubuntu/actions-runner-crawl/_work/kiosk-be-crawl/kiosk-be-crawl
-            docker-compose -f docker/docker-compose.yml down
-            docker-compose -f docker/docker-compose.yml pull
-            docker-compose -f docker/docker-compose.yml up -d
+            docker compose -f docker/docker-compose.yml down
+            docker compose -f docker/docker-compose.yml pull
+            docker compose -f docker/docker-compose.yml up -d
