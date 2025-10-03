@@ -4,7 +4,6 @@ services:
     expose:
       - "8000"
     container_name: kiosk-crawl
-    restart: unless-stopped
     networks:
       - kiosk-network
     healthcheck:
