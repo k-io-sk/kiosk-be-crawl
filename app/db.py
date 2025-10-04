@@ -25,3 +25,10 @@ def get_conn():
     )
 
     return conn
+
+def show_tables(conn):
+    cursor = conn.cursor()
+    cursor.execute("show tables;")
+    tables = cursor.fetchall()
+    cursor.close()
+    return [table[0] for table in tables]
