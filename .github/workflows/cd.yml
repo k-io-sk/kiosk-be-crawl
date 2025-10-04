@@ -25,13 +25,17 @@ jobs:
       
       - name: Deploy on server
         uses: appleboy/ssh-action@master
+        env:
+          ENV_PROD: ${{ secrets.ENV_PROD }}
         with:
+          envs: ENV_PROD
           host: ${{ secrets.SSH_HOST_PROD }}
           port: ${{ secrets.SSH_PORT_PROD }}
           username: ${{ secrets.SSH_USERNAME_PROD }}
           key: ${{ secrets.SSH_PRIVATE_KEY_PROD }}
           script: |
-            cd /home/ubuntu/actions-runner-crawl/_work/kiosk-be-crawl/kiosk-be-crawl
+            cd /home/ubuntu/actions-runner-crawl/_work/kiosk-be-crawl/kiosk-be-crawl/docker
+            echo "$ENV_PROD" > ./.env.prod
             docker compose -f docker/docker-compose.yml down
             docker compose -f docker/docker-compose.yml pull
             docker compose -f docker/docker-compose.yml up -d
