@@ -31,4 +31,4 @@ def show_tables(conn):
     cursor.execute("show tables;")
     tables = cursor.fetchall()
     cursor.close()
-    return [table[0] for table in tables]
+    print([table[0] for table in tables])
