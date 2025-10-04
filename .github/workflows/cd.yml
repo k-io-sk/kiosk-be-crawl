@@ -34,7 +34,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME_PROD }}
           key: ${{ secrets.SSH_PRIVATE_KEY_PROD }}
           script: |
-            cd /home/ubuntu/actions-runner-crawl/_work/kiosk-be-crawl/kiosk-be-crawl/docker
+            cd /home/ubuntu/actions-runner-crawl/_work/kiosk-be-crawl/kiosk-be-crawl
             echo "$ENV_PROD" > ./.env.prod
             docker compose -f docker/docker-compose.yml down
             docker compose -f docker/docker-compose.yml pull
