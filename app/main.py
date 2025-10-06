@@ -2,6 +2,9 @@ from crawlling import main_crawlling
 from db import soft_delete_event
 from datetime import date
 
+# ------------------------------
+# 오늘 날짜, 다음 달 날짜 반환 함수
+# ------------------------------
 def get_today_and_next_month():
     today = date.today()
     year = today.year
@@ -24,17 +27,24 @@ def get_today_and_next_month():
 
     return today, next_month_date
 
+# ------------------------------
+# 크롤링 메인 함수
+# ------------------------------
 def main():
     start, end = get_today_and_next_month()
 
     # 메뉴 번호 : 200008(공연), 200009(전시), 200010(축제), 200011(교육체험)
     # 지역코드 : 11110(종로구)
     # 카테고리 : SHOW, EXHIBITION, FESTIVAL, EDUEXP
+    print(f"SK_KIOSK: [ {start} 자동화 작업 시작 ]")
     main_crawlling(200008, 11110, 11110, 'SHOW', 'SHOW', start.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d"))
     main_crawlling(200009, 11110, 11110, 'EXHIBITION', 'EXHIBITION', start.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d"))
     main_crawlling(200010, 11110, 11110, 'FESTIVAL', 'FESTIVAL', start.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d"))
     main_crawlling(200011, 11110, 11110, 'EDUEXP', 'EDUEXP', start.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d"))
+
+    # 기간 지난 event soft delete
     soft_delete_event()
+    print(f"SK_KIOSK: [ {start} 자동화 작업 종료 ]")
 
 
 if __name__ == "__main__":
