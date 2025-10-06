@@ -1,6 +1,7 @@
 import mysql.connector
 from pathlib import Path
 from dotenv import load_dotenv
+from datetime import datetime
 import os
 
 env = os.environ.get("ENV", "local")
@@ -26,9 +27,94 @@ def get_conn():
 
     return conn
 
-def show_tables(conn):
+def parse_date(d):
+            try:
+                return datetime.strptime(d, "%Y-%m-%d").date() if d else None
+            except ValueError:
+                return None
+            
+def parse_float(v):
+            try:
+                return float(v) if v else None
+            except ValueError:
+                return None
+
+def insert_event(events):
+    conn = get_conn()
     cursor = conn.cursor()
-    cursor.execute("show tables;")
-    tables = cursor.fetchall()
+
+    sql = """
+    INSERT INTO event
+        (cult_code, title, location, start_date, end_date, event_time, category,
+        recruit_target, price, inquiry, main_image, address, latitude, longitude)
+    VALUES
+        (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+    ON DUPLICATE KEY UPDATE
+        title = VALUES(title),
+        location = VALUES(location),
+        start_date = VALUES(start_date),
+        end_date = VALUES(end_date),
+        event_time = VALUES(event_time),
+        category = VALUES(category),
+        recruit_target = VALUES(recruit_target),
+        price = VALUES(price),
+        inquiry = VALUES(inquiry),
+        main_image = VALUES(main_image),
+        address = VALUES(address),
+        latitude = VALUES(latitude),
+        longitude = VALUES(longitude)
+    """
+
+    inserted = 0
+    updated = 0
+    unchanged = 0
+
+    for e in events:
+        start_date = parse_date(e.get("start_date"))
+        end_date = parse_date(e.get("end_date"))
+        latitude = parse_float(e.get("latitude"))
+        longitude = parse_float(e.get("longitude"))
+
+        cursor.execute(sql, (
+            e.get("cult_code"),
+            e.get("title"),
+            e.get("location"),
+            start_date,
+            end_date,
+            e.get("event_time"),
+            e.get("category"),
+            e.get("recruit_target"),
+            e.get("price"),
+            e.get("inquiry"),
+            e.get("main_image"),
+            e.get("address"),
+            latitude,
+            longitude
+        ))
+
+        if cursor.rowcount == 1:
+            inserted += 1
+        elif cursor.rowcount == 2:
+            updated += 1
+        elif cursor.rowcount == 0:
+            unchanged += 1
+
+    conn.commit()
     cursor.close()
-    print([table[0] for table in tables])
+    conn.close()
+
+    print(f"SK_KIOSK: DB 작업 결과 [Inserted: {inserted}, Updated: {updated}, Unchanged: {unchanged}]")
+
+def soft_delete_event():
+    conn = get_conn()
+    cursor = conn.cursor()
+
+    print("SK_KIOSK: 만료된 이벤트 SOFT DELETE 작업 수행")
+
+    cursor.execute("UPDATE event SET status='ENDED' WHERE end_date < CURDATE()")
+    
+    print(f"SK_KIOSK: DB 작업 결과 [Soft_Deleted: {cursor.rowcount}]")
+
+    conn.commit()
+    cursor.close()
+    conn.close()
