@@ -4,6 +4,9 @@ from dotenv import load_dotenv
 from datetime import datetime
 import os
 
+# ------------------------------
+# 전역 변수 설정
+# ------------------------------
 env = os.environ.get("ENV", "local")
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -16,6 +19,9 @@ DB_USER = os.getenv("DB_USER")
 DB_PASS = os.getenv("DB_PASS")
 DB_NAME = os.getenv("DB_NAME")
 
+# ------------------------------
+# mysql connector 반환 함수
+# ------------------------------
 def get_conn():
     conn = mysql.connector.connect(
         host=DB_HOST,
@@ -27,18 +33,27 @@ def get_conn():
 
     return conn
 
+# ------------------------------
+# 문자열 날짜 -> 날짜 파싱 함수
+# ------------------------------
 def parse_date(d):
             try:
                 return datetime.strptime(d, "%Y-%m-%d").date() if d else None
             except ValueError:
                 return None
-            
+
+# ------------------------------
+# 문자열 -> float 변환 함수
+# ------------------------------
 def parse_float(v):
             try:
                 return float(v) if v else None
             except ValueError:
                 return None
 
+# ------------------------------
+# event DB 삽입 함수
+# ------------------------------
 def insert_event(events):
     conn = get_conn()
     cursor = conn.cursor()
@@ -105,6 +120,9 @@ def insert_event(events):
 
     print(f"SK_KIOSK: DB 작업 결과 [Inserted: {inserted}, Updated: {updated}, Unchanged: {unchanged}]")
 
+# ------------------------------
+# event DB soft delete 함수
+# ------------------------------
 def soft_delete_event():
     conn = get_conn()
     cursor = conn.cursor()

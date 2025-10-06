@@ -4,10 +4,10 @@ import urllib.parse
 from urllib.parse import urlencode
 import json
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from db import insert_event, get_conn
+from db import insert_event
 
 # ------------------------------
-# 상세 페이지 크롤링 함수 (변경 없음)
+# 상세 페이지 크롤링 함수
 # ------------------------------
 def webCrawlling(menuNo, searchDist, searchField, sdate, edate, pageIndex, cultCode):
     base = "https://culture.seoul.go.kr/culture/culture/cultureEvent/view.do"
@@ -28,7 +28,6 @@ def webCrawlling(menuNo, searchDist, searchField, sdate, edate, pageIndex, cultC
     html = urllib.request.urlopen(url)
     soup = BeautifulSoup(html, 'html.parser')
 
-    # 메인 이미지
     img = soup.select_one('div.img-box img')
     main_image = ""
     if img:
@@ -36,7 +35,6 @@ def webCrawlling(menuNo, searchDist, searchField, sdate, edate, pageIndex, cultC
         if main_image.startswith('/'):
             main_image = f"https://culture.seoul.go.kr{main_image}"
 
-    # 상세 정보
     tds = soup.select('div.type-box li div.type-td span')
     values = [td.get_text(strip=True) for td in tds]
 
@@ -73,7 +71,7 @@ def process_event(event, menuNo, searchDist, searchField, sdate, edate, pageInde
 
 
 # ------------------------------
-# 메인 크롤링 함수 (병렬 처리)
+# 메인 크롤링 함수
 # ------------------------------
 def main_crawlling(menuNo, searchDist, dist, searchField, field, sdate, edate):
     event_result = []
@@ -116,8 +114,7 @@ def main_crawlling(menuNo, searchDist, dist, searchField, field, sdate, edate):
         events = result.get("resultList", [])
         print(f"SK_KIOSK: {searchField} {pageIndex} 페이지에서 {len(events)}개 이벤트 수집 중...")
 
-        # 병렬 처리
-        with ThreadPoolExecutor(max_workers=8) as executor:
+        with ThreadPoolExecutor(max_workers=6) as executor:
             futures = [
                 executor.submit(process_event, e, menuNo, searchDist, searchField, sdate, edate, pageIndex)
                 for e in events
@@ -129,5 +126,4 @@ def main_crawlling(menuNo, searchDist, dist, searchField, field, sdate, edate):
 
     print(f"SK_KIOSK: {searchField} 에서 총 {len(event_result)}개 이벤트 수집 완료")
 
-    # DB 저장
     insert_event(event_result)
