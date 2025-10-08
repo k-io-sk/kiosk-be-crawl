@@ -59,10 +59,11 @@ def process_event(event, menuNo, searchDist, searchField, sdate, edate, pageInde
         "title": event.get('title', ''),
         "start_date": event.get('strtdate', ''),
         "end_date": event.get('endDate', ''),
-        "category": searchField,
+        "event_category": searchField,
         "latitude": event.get('xCoord', ''),
         "longitude": event.get('yCoord', ''),
-        "address": event.get('addr', '')
+        "address": event.get('addr', ''),
+        "status": "ONGOING"
     }
     wcInfo = webCrawlling(menuNo, searchDist, searchField, sdate, edate, pageIndex, event['cultcode'])
     if isinstance(wcInfo, dict):

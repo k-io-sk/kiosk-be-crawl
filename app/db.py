@@ -60,24 +60,25 @@ def insert_event(events):
 
     sql = """
     INSERT INTO event
-        (cult_code, title, location, start_date, end_date, event_time, category,
-        recruit_target, price, inquiry, main_image, address, latitude, longitude)
+        (cult_code, title, location, start_date, end_date, event_time, event_category,
+        recruit_target, price, inquiry, main_image, address, latitude, longitude, status)
     VALUES
-        (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     ON DUPLICATE KEY UPDATE
         title = VALUES(title),
         location = VALUES(location),
         start_date = VALUES(start_date),
         end_date = VALUES(end_date),
         event_time = VALUES(event_time),
-        category = VALUES(category),
+        event_category = VALUES(event_category),
         recruit_target = VALUES(recruit_target),
         price = VALUES(price),
         inquiry = VALUES(inquiry),
         main_image = VALUES(main_image),
         address = VALUES(address),
         latitude = VALUES(latitude),
-        longitude = VALUES(longitude)
+        longitude = VALUES(longitude),
+        status = VALUES(status)
     """
 
     inserted = 0
@@ -97,14 +98,15 @@ def insert_event(events):
             start_date,
             end_date,
             e.get("event_time"),
-            e.get("category"),
+            e.get("event_category"),
             e.get("recruit_target"),
             e.get("price"),
             e.get("inquiry"),
             e.get("main_image"),
             e.get("address"),
             latitude,
-            longitude
+            longitude,
+            e.get("status")
         ))
 
         if cursor.rowcount == 1:
