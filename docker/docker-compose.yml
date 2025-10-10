@@ -8,6 +8,7 @@ services:
       - .env.prod
     environment:
       - ENV=prod
+      - TZ=Asia/Seoul
     networks:
       - kiosk-network
 
