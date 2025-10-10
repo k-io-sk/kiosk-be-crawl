@@ -61,9 +61,9 @@ def insert_event(events):
     sql = """
     INSERT INTO event
         (cult_code, title, location, start_date, end_date, event_time, event_category,
-        recruit_target, price, inquiry, main_image, address, latitude, longitude, status)
+        recruit_target, price, inquiry, main_image, address, latitude, longitude, status, created_at, modified_at)
     VALUES
-        (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     ON DUPLICATE KEY UPDATE
         title = VALUES(title),
         location = VALUES(location),
@@ -78,7 +78,9 @@ def insert_event(events):
         address = VALUES(address),
         latitude = VALUES(latitude),
         longitude = VALUES(longitude),
-        status = VALUES(status)
+        status = VALUES(status),
+        created_at = VALUES(created_at),
+        modified_at = VALUES(modified_at)
     """
 
     inserted = 0
@@ -90,6 +92,8 @@ def insert_event(events):
         end_date = parse_date(e.get("end_date"))
         latitude = parse_float(e.get("latitude"))
         longitude = parse_float(e.get("longitude"))
+        created_at = datetime.now()
+        modified_at = None
 
         cursor.execute(sql, (
             e.get("cult_code"),
@@ -106,7 +110,9 @@ def insert_event(events):
             e.get("address"),
             latitude,
             longitude,
-            e.get("status")
+            e.get("status"),
+            created_at,
+            modified_at
         ))
 
         if cursor.rowcount == 1:
