@@ -79,7 +79,6 @@ def insert_event(events):
         latitude = VALUES(latitude),
         longitude = VALUES(longitude),
         status = VALUES(status),
-        created_at = VALUES(created_at),
         modified_at = VALUES(modified_at)
     """
 
