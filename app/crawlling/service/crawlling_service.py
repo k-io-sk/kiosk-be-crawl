@@ -3,11 +3,30 @@ import urllib.request
 import urllib.parse
 from urllib.parse import urlencode
 import json
+from io import BytesIO
+from PIL import Image
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from db import insert_event
+from app.crawlling.repository.crawlling_repository import insert_event, is_exist_event
+from app.s3.service.s3_service import upload_s3, convert_path, create_keyName
 
 # ------------------------------
-# 상세 페이지 크롤링 함수
+# 3. 이미지 변환 함수
+# ------------------------------
+def convert_image(main_image_url):
+    url = main_image_url
+    with urllib.request.urlopen(url) as response:
+        img_data = response.read()
+
+    img = Image.open(BytesIO(img_data))
+    output_buffer = BytesIO()
+    img.save(output_buffer, format="WEBP", quality=85)
+    output_buffer.seek(0)
+
+    return output_buffer
+
+
+# ------------------------------
+# 3. 상세 페이지 크롤링 함수
 # ------------------------------
 def webCrawlling(menuNo, searchDist, searchField, sdate, edate, pageIndex, cultCode):
     base = "https://culture.seoul.go.kr/culture/culture/cultureEvent/view.do"
@@ -28,30 +47,38 @@ def webCrawlling(menuNo, searchDist, searchField, sdate, edate, pageIndex, cultC
     html = urllib.request.urlopen(url)
     soup = BeautifulSoup(html, 'html.parser')
 
-    img = soup.select_one('div.img-box img')
-    main_image = ""
-    if img:
-        main_image = img.get('src')
-        if main_image.startswith('/'):
-            main_image = f"https://culture.seoul.go.kr{main_image}"
+    s3_main_image_url = is_exist_event(cultCode)
+    if s3_main_image_url==False:
+        main_image = soup.select_one('div.img-box img')
+        if main_image:
+            main_image_url = main_image.get('src')
+            if main_image_url.startswith('/'):
+                main_image_url = f"https://culture.seoul.go.kr{main_image_url}"
+                output = convert_image(main_image_url)
+                s3_main_image_url = upload_s3(output, create_keyName(convert_path("m2")), "image/webp")
 
     tds = soup.select('div.type-box li div.type-td span')
     values = [td.get_text(strip=True) for td in tds]
 
+    detail = soup.select_one('div.detail-btn a')
+    detail_url = ""
+    if detail:
+        detail_url = detail.get('href')
+    
     result = {
-        "main_image": main_image,
+        "main_image": s3_main_image_url,
         "location": values[0] if len(values) > 0 else "",
         "event_time": values[2] if len(values) > 2 else "",
         "recruit_target": values[3] if len(values) > 3 else "",
         "price": values[4] if len(values) > 4 else "",
-        "inquiry": values[5] if len(values) > 5 else ""
+        "inquiry": values[5] if len(values) > 5 else "",
+        "detail_url": detail_url
     }
 
     return result
 
-
 # ------------------------------
-# 각 이벤트를 처리하는 작업 단위
+# 2. 각 이벤트를 처리하는 작업 단위
 # ------------------------------
 def process_event(event, menuNo, searchDist, searchField, sdate, edate, pageIndex):
     item = {
@@ -70,11 +97,10 @@ def process_event(event, menuNo, searchDist, searchField, sdate, edate, pageInde
         item.update(wcInfo)
     return item
 
-
 # ------------------------------
-# 메인 크롤링 함수
+# 1. 메인 크롤링 함수
 # ------------------------------
-def main_crawlling(menuNo, searchDist, dist, searchField, field, sdate, edate):
+def mainCrawlling(menuNo, searchDist, dist, searchField, field, sdate, edate):
     event_result = []
     url = 'https://culture.seoul.go.kr/culture/culture/cultureEvent/jsonList.json'
     pageIndex = 1
