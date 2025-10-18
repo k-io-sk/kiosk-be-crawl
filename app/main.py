@@ -1,5 +1,5 @@
-from crawlling import main_crawlling
-from db import soft_delete_event
+from app.crawlling.service.crawlling_service import mainCrawlling
+from app.crawlling.repository.crawlling_repository import softDelete_event
 from datetime import date
 
 # ------------------------------
@@ -37,13 +37,13 @@ def main():
     # 지역코드 : 11110(종로구)
     # 카테고리 : SHOW, EXHIBITION, FESTIVAL, EDUEXP
     print(f"SK_KIOSK: [ {start} 자동화 작업 시작 ]")
-    main_crawlling(200008, 11110, 11110, 'SHOW', 'SHOW', start.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d"))
-    main_crawlling(200009, 11110, 11110, 'EXHIBITION', 'EXHIBITION', start.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d"))
-    main_crawlling(200010, 11110, 11110, 'FESTIVAL', 'FESTIVAL', start.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d"))
-    main_crawlling(200011, 11110, 11110, 'EDUEXP', 'EDUEXP', start.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d"))
+    mainCrawlling(200008, 11110, 11110, 'SHOW', 'SHOW', start.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d"))
+    mainCrawlling(200009, 11110, 11110, 'EXHIBITION', 'EXHIBITION', start.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d"))
+    mainCrawlling(200010, 11110, 11110, 'FESTIVAL', 'FESTIVAL', start.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d"))
+    mainCrawlling(200011, 11110, 11110, 'EDUEXP', 'EDUEXP', start.strftime("%Y-%m-%d"), end.strftime("%Y-%m-%d"))
 
     # 기간 지난 event soft delete
-    soft_delete_event()
+    softDelete_event()
     print(f"SK_KIOSK: [ {start} 자동화 작업 종료 ]")
 
 
