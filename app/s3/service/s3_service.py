@@ -13,6 +13,8 @@ S3 = boto3.client("s3", aws_access_key_id=AWS_ACCESS_KEY, aws_secret_access_key=
 def convert_path(path):
     if(path=="m"):
         return os.getenv("S3_PATH_M")
+    else:
+        return "N"
 
 # ------------------------------
 #  s3 경로 생성 함수

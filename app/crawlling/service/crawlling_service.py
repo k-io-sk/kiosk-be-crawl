@@ -55,7 +55,7 @@ def webCrawlling(menuNo, searchDist, searchField, sdate, edate, pageIndex, cultC
             if main_image_url.startswith('/'):
                 main_image_url = f"https://culture.seoul.go.kr{main_image_url}"
                 output = convert_image(main_image_url)
-                s3_main_image_url = upload_s3(output, create_keyName(convert_path("m2")), "image/webp")
+                s3_main_image_url = upload_s3(output, create_keyName(convert_path("m")), "image/webp")
 
     tds = soup.select('div.type-box li div.type-td span')
     values = [td.get_text(strip=True) for td in tds]
