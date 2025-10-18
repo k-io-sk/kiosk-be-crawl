@@ -2,11 +2,11 @@ FROM python:3.12-slim
 
 RUN pip install --no-cache-dir uv
 
-WORKDIR /app
+WORKDIR /crawl
 
 COPY ../pyproject.toml ../uv.lock* ../requirements.txt* ./
-COPY ../app/ .
+COPY ../app .
 
 RUN uv sync --frozen
 
-CMD ["uv", "run", "python", "-m", "main.py"]
+CMD ["uv", "run", "-m", "app.main"]
