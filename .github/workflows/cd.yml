@@ -19,6 +19,7 @@ jobs:
           cd /home/runner/work/kiosk-be-crawl/kiosk-be-crawl
           docker buildx build -f ./docker/Dockerfile -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }} --push .
 
+
   deploy:
     runs-on: self-hosted
     

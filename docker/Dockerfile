@@ -4,8 +4,8 @@ RUN pip install --no-cache-dir uv
 
 WORKDIR /crawl
 
-COPY ../pyproject.toml ../uv.lock* ../requirements.txt* ./
-COPY ../app .
+COPY pyproject.toml uv.lock* requirements.txt* ./
+COPY app ./app
 
 RUN uv sync --frozen
 
